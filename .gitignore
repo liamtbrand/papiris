@@ -1,0 +1,17 @@
+.DS_Store
+
+\.ninja_log
+
+\.ninja_deps
+
+*.ninja
+
+build/
+
+CMakeFiles/
+
+CMakeCache.txt
+
+*.cmake
+
+lib/
