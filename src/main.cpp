@@ -5,42 +5,12 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
-#include "sqlite3.h"
-#include <Magick++.h>
-#include <tesseract/baseapi.h>
-#include <leptonica/allheaders.h>
+#include <boost/filesystem/fstream.hpp>
 //#include <openssl/md5.h>
 
 #include "CommandParser.hpp"
 #include "FileIndexDB.hpp"
-
-std::string getHash( std::string filename ) {
-    return filename; // We use the filename for now.
-}
-
-std::string call_tesseract( std::string img ) {
-    // Tesseract
-    char* outText;
-    tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
-    
-    if (api->Init(NULL, "eng")) {
-        std::cout << "Could not initialize tesseract.\n";
-        exit(1);
-    }
-    
-    Pix *image = pixRead( img.c_str() );
-    api->SetImage(image);
-    outText = api->GetUTF8Text();
-    return std::string(outText);
-    std::cout << "Tesseract:" << outText << "\n";
-    std::string out = std::string( "" ) + outText;
-    
-    api->End();
-    delete [] outText;
-    pixDestroy(&image);
-    
-    return out;
-}
+#include "Iris.hpp"
 
 int main( int argc, const char* argv[] ) {
     
@@ -65,12 +35,13 @@ int main( int argc, const char* argv[] ) {
     boost::filesystem::path full_db_file_path = home_path / papiris_path / db_file_path;
     boost::filesystem::path index_dir = home_path / papiris_path / "index";
     boost::filesystem::create_directory( index_dir );
+    //boost::filesystem::path path_here = ".";
     
-    // Create the database connection
-    FileIndexDB db = FileIndexDB( full_db_file_path.string().c_str() );
-    db.connect();
-    
-    db.createTables(); // Ensure we have the correct database..
+    std::string db_path = full_db_file_path.string();
+    FileIndexDB index = FileIndexDB( db_path.c_str() );
+    index.connect(); // Create the database connection
+    index.createTables(); // Ensure we have the correct database..
+    Iris iris = Iris( 300 );
     
     std::cout << "[Papiris]: Started.\n";
     
@@ -79,11 +50,20 @@ int main( int argc, const char* argv[] ) {
     boost::filesystem::recursive_directory_iterator dir( home_path ), itr_end;
     while ( dir != itr_end ) {
         try {
-            boost::filesystem::path d = dir->path();
+            boost::filesystem::path f = dir->path();
             
-            if( is_regular_file( d ) && d.extension() == ".pdf" ) {
-                int id = db.fetchPathId( d );
-                std::cout << "file" << d << std::endl;
+            if( is_regular_file( f ) && f.extension() == ".pdf" ) {
+                // If we don't need to update this file, just stop.
+                if( index.needsUpdate( f ) ) {
+                    // Only do something if we need to update the file.
+                    std::string data = iris.read( f );
+                    
+                    boost::filesystem::path file = index_dir / (f.filename().string() + ".papiris");
+                    boost::filesystem::ofstream ofs( file );
+                    ofs
+                    << f.string() << std::endl
+                    << data << std::endl;
+                }
             }
             
         } catch( boost::filesystem::filesystem_error& e ) {
@@ -91,7 +71,7 @@ int main( int argc, const char* argv[] ) {
         }
         
         // Throttle back the speed so we don't use too much cpu.
-        int throttle_back = 1;
+        int throttle_back = 0;
         std::this_thread::sleep_for ( std::chrono::milliseconds( throttle_back ) );
         
         // Try to get the next directory.
@@ -113,24 +93,20 @@ int main( int argc, const char* argv[] ) {
     // example test...
     try {
         
-        Magick::Image image;
         
+        /*
         std::string file = "example.pdf";
         
         std::string hash = getHash( file );
         
-        
-        
-        image.density( "300" );
-        image.read( file );
-        image.magick( "png" );
+        image.magick( intermediate_format );
         
         //Magick::Blob blob;
         //image.write( &blob );
         image.write( "tmp.png" );
         
         std::string data = call_tesseract( "tmp.png" );
-        std::cout << data << "\n";
+        std::cout << data << "\n";*/
         
         /*
         Magick::ReadOptions options;
@@ -168,7 +144,7 @@ int main( int argc, const char* argv[] ) {
     
     std::cout << "Stopping Papiris.\n";
     
-    db.close();
+    index.close();
     
     std::cout << "Stopped.\n";
     

@@ -42,12 +42,10 @@ void FileIndexDB::createTables()
     char* zErrMsg;
     int rc;
     
-    std::cout << create_table_paths << std::endl;
-    
     /* Execute Query */
     rc = sqlite3_exec(
         db,
-        create_table_paths,
+        create_table_files,
         default_callback,
         0,
         &zErrMsg
@@ -62,6 +60,49 @@ void FileIndexDB::createTables()
     }
 }
 
+bool FileIndexDB::needsUpdate( boost::filesystem::path file )
+{
+    // TODO(liam): Sanitise the path so we can't escape it.. Or find another way.
+    
+    return true; // TODO(liam): remove this. Just say we need to update all files for now.
+    
+    // Check path.
+    
+    /*
+    std::ostringstream query;
+    query
+    << "SELECT id FROM files WHERE "
+    << "path='" << path << "';";
+    
+    char* zErrMsg;
+    int rc;
+    
+    std::string querystr = query.str();
+    
+    // Execute Query
+    rc = sqlite3_exec(
+        db,
+        querystr.c_str(),
+        default_callback,
+        0,
+        &zErrMsg
+    );
+    
+    // Check Status
+    if( rc != SQLITE_OK ){
+        std::cout << "SQL error: " << zErrMsg << std::endl;
+        sqlite3_free( zErrMsg );
+    }
+    return rc;
+    */
+    
+    // Inspect file modified data.
+    // Inspect papiris file integrity.
+    
+    // Determine if it needs an update.
+}
+
+/*
 int FileIndexDB::fetchPathId( boost::filesystem::path path )
 {
     // Ensure we are using the canonical path.
@@ -72,7 +113,8 @@ int FileIndexDB::fetchPathId( boost::filesystem::path path )
     // Return the path's id.
     return 1;
 }
-
+*/
+/*
 int FileIndexDB::addPath( const char* path, int parent )
 {
     std::ostringstream query;
@@ -93,7 +135,7 @@ int FileIndexDB::addPath( const char* path, int parent )
     
     std::string querystr = query.str();
     
-    /* Execute Query */
+    // Execute Query
     rc = sqlite3_exec(
         db,
         querystr.c_str(),
@@ -102,10 +144,11 @@ int FileIndexDB::addPath( const char* path, int parent )
         &zErrMsg
     );
     
-    /* Check Status */
+    // Check Status
     if( rc != SQLITE_OK ){
         std::cout << "SQL error: " << zErrMsg << std::endl;
         sqlite3_free( zErrMsg );
     }
     return rc;
 }
+*/

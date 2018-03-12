@@ -28,33 +28,22 @@ public:
     static int default_callback(void *NotUsed, int argc, char **argv, char **azColName);
     void createTables();
     
-    int fetchPathId( boost::filesystem::path path );
-    
-    int addPath( const char* path, int parent );
+    bool needsUpdate( boost::filesystem::path file );
     
 private:
     const char* db_path;
     sqlite3* db;
     
-    std::vector< int > cached_path;
+    const char* create_table_files = R"EOF(
+    CREATE TABLE files(
+        id int IDENTITY,
+        path varchar(255) UNIQUE,
+        modified int,
+        PRIMARY KEY (id)
+    );
+    )EOF";
     
-    const char* create_table_paths =
-    "CREATE TABLE paths("
-    "  id int IDENTITY,"
-    "  path varchar(255),"
-    "  parent int,"
-    "  PRIMARY KEY (id),"
-    "  FOREIGN KEY (parent) REFERENCES id"
-    ");";
-    
-    const char* create_table_files =
-    "CREATE TABLE files("
-    "  id int,"
-    "  path varchar(255),"
-    "  parent int,"
-    "  PRIMARY KEY (id),"
-    "  FOREIGN KEY (parent) REFERENCES (paths.id)"
-    ");";
+    int getId( std::string path );
 };
 
 #endif /* FileIndexDB_hpp */
