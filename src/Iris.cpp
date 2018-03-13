@@ -20,10 +20,10 @@ std::string Iris::call_tesseract( std::string img ) {
     Pix *image = pixRead( img.c_str() );
     api->SetImage(image);
     outText = api->GetUTF8Text();
-    return std::string(outText);
-    std::cout << "Tesseract:" << outText << "\n";
-    std::string out = std::string( "" ) + outText;
     
+    std::string out = std::string( outText );
+    
+    // IMPORTANT, don't leak memory here!!
     api->End();
     delete [] outText;
     pixDestroy(&image);

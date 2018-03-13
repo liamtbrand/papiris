@@ -22,7 +22,7 @@ int FileIndexDB::connect()
     std::cout << "[Papiris]: Connecting to database..." << std::endl;
     int rc;
     
-    rc = sqlite3_open( db_path, &db );
+    rc = sqlite3_open( db_file.string().c_str(), &db );
     if( rc ) {
         std::cout << "[Papiris]: Couldn't open database! Severe." << std::endl;
         sqlite3_close( db );
@@ -60,11 +60,11 @@ void FileIndexDB::createTables()
     }
 }
 
-bool FileIndexDB::needsUpdate( boost::filesystem::path file )
-{
+//bool FileIndexDB::needsUpdate( boost::filesystem::path file )
+//{
     // TODO(liam): Sanitise the path so we can't escape it.. Or find another way.
     
-    return true; // TODO(liam): remove this. Just say we need to update all files for now.
+//    return true; // TODO(liam): remove this. Just say we need to update all files for now.
     
     // Check path.
     
@@ -100,7 +100,9 @@ bool FileIndexDB::needsUpdate( boost::filesystem::path file )
     // Inspect papiris file integrity.
     
     // Determine if it needs an update.
-}
+//}
+
+
 
 /*
 int FileIndexDB::fetchPathId( boost::filesystem::path path )

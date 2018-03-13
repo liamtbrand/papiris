@@ -16,8 +16,8 @@
 class FileIndexDB
 {
 public:
-    FileIndexDB( const char* database_path )
-        : db_path( database_path )
+    FileIndexDB( boost::filesystem::path db_file_path )
+        : db_file( db_file_path )
         , db( nullptr )
     {
     }
@@ -25,13 +25,16 @@ public:
     int connect();
     void close();
     
-    static int default_callback(void *NotUsed, int argc, char **argv, char **azColName);
     void createTables();
     
-    bool needsUpdate( boost::filesystem::path file );
+    static int default_callback(void *NotUsed, int argc, char **argv, char **azColName);
+    
+    //bool needsUpdate( boost::filesystem::path file );
+    
+    //void updateFor( boost::filesystem::path file, std::string data );
     
 private:
-    const char* db_path;
+    boost::filesystem::path db_file;
     sqlite3* db;
     
     const char* create_table_files = R"EOF(
