@@ -1,10 +1,3 @@
-//
-//  FileIndex.hpp
-//  
-//
-//  Created by Liam Brand on 13/03/18.
-//
-
 #ifndef FileIndex_hpp
 #define FileIndex_hpp
 
@@ -22,7 +15,7 @@ public:
         db.connect();
         db.createTables();
     }
-    
+
     bool needsUpdate( boost::filesystem::path file );
     void update( boost::filesystem::path file, std::string data );
 private:

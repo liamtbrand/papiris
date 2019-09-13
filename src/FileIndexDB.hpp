@@ -1,10 +1,3 @@
-//
-//  FileIndexDB.hpp
-//  
-//
-//  Created by Liam Brand on 11/03/18.
-//
-
 #ifndef FileIndexDB_hpp
 #define FileIndexDB_hpp
 
@@ -21,22 +14,22 @@ public:
         , db( nullptr )
     {
     }
-    
+
     int connect();
     void close();
-    
+
     void createTables();
-    
+
     static int default_callback(void *NotUsed, int argc, char **argv, char **azColName);
-    
+
     //bool needsUpdate( boost::filesystem::path file );
-    
+
     //void updateFor( boost::filesystem::path file, std::string data );
-    
+
 private:
     boost::filesystem::path db_file;
     sqlite3* db;
-    
+
     const char* create_table_files = R"EOF(
     CREATE TABLE files(
         id int IDENTITY,
@@ -45,7 +38,7 @@ private:
         PRIMARY KEY (id)
     );
     )EOF";
-    
+
     int getId( std::string path );
 };
 

@@ -1,10 +1,3 @@
-//
-//  Crawler.cpp
-//  
-//
-//  Created by Liam Brand on 11/03/18.
-//
-
 #include "Crawler.hpp"
 
 void Crawler::crawl( boost::filesystem::path root )
@@ -13,7 +6,7 @@ void Crawler::crawl( boost::filesystem::path root )
     while ( dir != itr_end ) {
         try {
             boost::filesystem::path f = dir->path();
-            
+
             if( is_regular_file( f ) && f.extension() == ".pdf" ) {
                 // If we don't need to update this file, just stop.
                 if( index.needsUpdate( f ) ) {
@@ -23,15 +16,15 @@ void Crawler::crawl( boost::filesystem::path root )
                     index.update( f, data );
                 }
             }
-            
+
         } catch( boost::filesystem::filesystem_error& e ) {
             std::cout << e.what() << std::endl;
         }
-        
+
         // Throttle back the speed so we don't use too much cpu.
         int throttle_back = 0;
         std::this_thread::sleep_for ( std::chrono::milliseconds( throttle_back ) );
-        
+
         // Try to get the next directory.
         try {
             ++dir;

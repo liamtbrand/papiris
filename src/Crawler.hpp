@@ -1,10 +1,3 @@
-//
-//  Crawler.hpp
-//  
-//
-//  Created by Liam Brand on 11/03/18.
-//
-
 #ifndef Crawler_hpp
 #define Crawler_hpp
 
@@ -23,7 +16,7 @@ public:
         , index( file_index )
     {
     }
-    
+
     void crawl( boost::filesystem::path root );
 private:
     Iris iris;
